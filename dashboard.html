@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Anomaly Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2>Live Anomaly Detection</h2>
+    <p>Status: <span id="status">Connecting...</span></p>
+    <canvas id="myChart" width="800" height="400"></canvas>
+
+    <script>
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {label: 'Normal', data: [], backgroundColor: 'blue'},
+                    {label: 'Anomaly', data: [], backgroundColor: 'red'}
+                ]
+            },
+            options: {scales: {x: {title: {display: true, text: 'X'}}, y: {title: {display: true, text: 'Y'}}}}
+        });
+
+        const ws = new WebSocket("ws://127.0.0.1:8000/ws");
+
+        ws.onopen = () => document.getElementById("status").innerText = "Connected";
+        ws.onclose = () => document.getElementById("status").innerText = "Disconnected";
+
+        ws.onmessage = (event) => {
+            const msg = JSON.parse(event.data);
+            const point = {x: msg.x, y: msg.y};
+
+            if (msg.is_anomaly == true) {
+                chart.data.datasets[1].data.push(point); // Red
+            } else {
+                chart.data.datasets[0].data.push(point); // Blue
+            }
+            chart.update();
+        };
+    </script>
+</body>
+</html>
