@@ -22,7 +22,7 @@ async def websocket_endpoint(websocket: WebSocket):
     print("Dashboard Connected")
     try:
         while True:
-            # 20% chance to make an obvious anomaly so you see red
+            # 20% chance to make an obvious anomaly so can see red
             if random.random() < 0.2:
                 x = random.uniform(4, 6)
                 y_value = random.uniform(4, 6)
